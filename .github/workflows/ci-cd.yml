@@ -43,27 +43,45 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm audit --omit=dev --audit-level=moderate
-      - name: Prepare isolated storage and scanner
+      - name: Start S3-compatible storage (moto)
         run: |
           python -m pip install 'moto[server]>=5.0,<6'
-          python -m moto.server -H 127.0.0.1 -p 9000 > /tmp/pronatec-storage.log 2>&1 &
+          nohup python -m moto.server -H 127.0.0.1 -p 9000 > /tmp/pronatec-storage.log 2>&1 &
+      - name: Install ClamAV
+        run: |
           sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y clamav-daemon
-          sudo systemctl stop clamav-freshclam || true
-          sudo freshclam
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y clamav-daemon clamav-freshclam
+          sudo systemctl stop clamav-daemon clamav-freshclam || true
+      - name: Download ClamAV signatures
+        run: |
+          for attempt in 1 2 3 4; do
+            sudo freshclam && exit 0
+            echo "freshclam attempt $attempt failed; retrying"
+            sleep 20
+          done
+          exit 1
+      - name: Start ClamAV daemon
+        run: |
           printf '%s\n' 'DatabaseDirectory /var/lib/clamav' 'TCPSocket 3310' 'TCPAddr 127.0.0.1' 'Foreground yes' 'StreamMaxLength 110M' 'MaxFileSize 110M' 'MaxScanSize 300M' 'MaxRecursion 16' 'User clamav' > /tmp/pronatec-clamd.conf
-          sudo clamd --config-file=/tmp/pronatec-clamd.conf > /tmp/pronatec-scanner.log 2>&1 &
+          sudo nohup clamd --config-file=/tmp/pronatec-clamd.conf > /tmp/pronatec-scanner.log 2>&1 &
+      - name: Wait for storage and scanner
+        run: |
           python - <<'PY'
-          import socket, time
-          for port in [9000, 3310]:
-              for attempt in range(120):
+          import pathlib, socket, sys, time
+
+          SERVICES = {9000: '/tmp/pronatec-storage.log', 3310: '/tmp/pronatec-scanner.log'}
+          for port, log in SERVICES.items():
+              for _ in range(180):
                   try:
                       with socket.create_connection(('127.0.0.1', port), timeout=1):
                           break
                   except OSError:
                       time.sleep(1)
               else:
-                  raise RuntimeError(f'Test service on {port} unavailable')
+                  path = pathlib.Path(log)
+                  tail = path.read_text(errors='replace')[-2000:] if path.exists() else '(no log)'
+                  print(f'Service on port {port} unavailable. Log tail:\n{tail}', file=sys.stderr)
+                  sys.exit(1)
           PY
       - run: npm run test:integration
       - name: Build application image
