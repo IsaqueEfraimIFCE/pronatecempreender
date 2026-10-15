@@ -72,6 +72,7 @@ test('real PostgreSQL and S3: resume, permissions, atomic batches and retries', 
     uploadLimit: 10,
     storageQuota: 1024 ** 3,
     dailyQuota: 1024 ** 3,
+    sync: { enabled: false },
     s3: {
       durableParts: process.env.TEST_S3_DURABLE_PARTS === 'true',
       endpoint: process.env.TEST_S3_ENDPOINT,
