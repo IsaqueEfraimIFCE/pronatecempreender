@@ -67,21 +67,35 @@ jobs:
       - name: Wait for storage and scanner
         run: |
           python - <<'PY'
-          import pathlib, socket, sys, time
+          import pathlib, socket, subprocess, sys, time
 
           SERVICES = {9000: '/tmp/pronatec-storage.log', 3310: '/tmp/pronatec-scanner.log'}
+
+          def reachable(port):
+              try:
+                  with socket.create_connection(('127.0.0.1', port), timeout=1):
+                      return True
+              except OSError:
+                  return False
+
+          def annotate(title, text):
+              body = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::error title={title}::{body}')
+
+          failed = []
           for port, log in SERVICES.items():
-              for _ in range(180):
-                  try:
-                      with socket.create_connection(('127.0.0.1', port), timeout=1):
-                          break
-                  except OSError:
-                      time.sleep(1)
-              else:
-                  path = pathlib.Path(log)
-                  tail = path.read_text(errors='replace')[-2000:] if path.exists() else '(no log)'
-                  print(f'Service on port {port} unavailable. Log tail:\n{tail}', file=sys.stderr)
-                  sys.exit(1)
+              deadline = time.monotonic() + 180
+              while not reachable(port) and time.monotonic() < deadline:
+                  time.sleep(1)
+              if reachable(port):
+                  continue
+              failed.append(port)
+              path = pathlib.Path(log)
+              tail = path.read_text(errors='replace')[-1500:] if path.exists() else '(no log)'
+              sockets = subprocess.run(['ss', '-ltn'], capture_output=True, text=True).stdout
+              procs = subprocess.run(['pgrep', '-af', 'clamd|moto'], capture_output=True, text=True).stdout
+              annotate(f'Port {port} unavailable', f'{tail}\n--- listening ---\n{sockets}\n--- processes ---\n{procs}')
+          sys.exit(1 if failed else 0)
           PY
       - run: npm run test:integration
       - name: Build application image
