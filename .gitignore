@@ -1,12 +1,24 @@
+# Dependencies and build output
 node_modules/
 dist/
+coverage/
+
+# Local configuration and secrets - never commit real values
 .env
-.env.local
-.env.*.local
-frontend/node_modules/
-frontend/dist/
-frontend/.env
-apps-script/
-.agents/
-.claude/
-skills-lock.json
+.env.*
+!.env.example
+
+# Logs and runtime state
+*.log
+npm-debug.log*
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Test and tooling output
+test-results/
+playwright-report/
