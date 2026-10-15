@@ -1,0 +1,23 @@
+{
+  "name": "@pronatec/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "worker": "node src/worker.js",
+    "migrate": "node src/db/migrate.js"
+  },
+  "dependencies": {
+    "@pronatec/shared": "*",
+    "fastify": "^5.0.0",
+    "@fastify/static": "^10.1.6",
+    "@fastify/cookie": "^11.0.0",
+    "@fastify/helmet": "^13.0.0",
+    "pg": "^8.16.0",
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/s3-request-presigner": "^3.0.0",
+    "yauzl": "^3.2.0",
+    "cfb": "^1.2.2"
+  }
+}

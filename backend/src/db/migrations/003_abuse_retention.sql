@@ -1,0 +1,1 @@
+ALTER TABLE reports ALTER COLUMN origin_hash DROP NOT NULL;
