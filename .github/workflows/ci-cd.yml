@@ -98,6 +98,23 @@ jobs:
               annotate(f'Port {port} unavailable', f'{tail}\n--- listening ---\n{sockets}\n--- processes ---\n{procs}')
           sys.exit(1 if failed else 0)
           PY
-      - run: npm run test:integration
+      - name: Integration tests
+        run: |
+          set +e
+          npm run test:integration 2>&1 | tee /tmp/integration.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            python3 - <<'PY'
+          import re
+          text = open('/tmp/integration.log', errors='replace').read()
+          failing = [l for l in text.splitlines() if re.search(r'✖|not ok|Error|ECONN|ENOT|denied|failed', l)][:25]
+          def annotate(title, body):
+              body = body.replace('%', '%25').replace('\r', '').replace('\n', '%0A')
+              print(f'::error title={title}::{body}')
+          annotate('Integration failures', '\n'.join(failing) or '(no matching lines)')
+          annotate('Integration output tail', text[-2500:])
+          PY
+          fi
+          exit $status
       - name: Build application image
         run: docker build -t pronatec-hosted:test .
