@@ -1,0 +1,55 @@
+# Set app name, region, external database/storage/scanner and secrets before launch.
+app = "pronatec-empreender"
+primary_region = "gru"
+kill_signal = "SIGTERM"
+kill_timeout = 150
+[build]
+  dockerfile = "Dockerfile"
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+  TRUST_FLY_PROXY = "true"
+  APP_ORIGIN = "https://pronatec-empreender.fly.dev"
+  S3_REGION = "auto"
+  S3_ENDPOINT = "https://pronatec-empreender-storage.fly.dev"
+  S3_BUCKET = "reports"
+  S3_FORCE_PATH_STYLE = "true"
+  S3_DURABLE_PARTS = "true"
+  CLAMD_HOST = "pronatec-empreender-scan.internal"
+  UPLOADS_PER_HOUR = "10"
+  STORAGE_QUOTA_BYTES = "21474836480"
+  DAILY_UPLOAD_QUOTA_BYTES = "10737418240"
+  SYNC_INTERVAL_MINUTES = "10"
+[[files]]
+  guest_path = "/app/postgres-ca.crt"
+  secret_name = "DATABASE_CA_PEM"
+[deploy]
+  release_command = "node backend/src/db/migrate.js"
+[processes]
+  web = "node backend/src/server.js"
+  worker = "node backend/src/worker.js"
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["web"]
+  [http_service.http_options]
+    idle_timeout = 300
+  [[http_service.checks]]
+    grace_period = "15s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health/ready"
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "512mb"
+  processes = ["web"]
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "1gb"
+  processes = ["worker"]

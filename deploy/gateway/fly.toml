@@ -1,0 +1,21 @@
+app = "pronatec-empreender-storage"
+primary_region = "gru"
+kill_signal = "SIGTERM"
+kill_timeout = 150
+[build]
+  dockerfile = "Dockerfile"
+[[mounts]]
+  source = "gateway_config"
+  destination = "/data"
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  [http_service.http_options]
+    idle_timeout = 300
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "512mb"

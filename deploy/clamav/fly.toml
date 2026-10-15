@@ -1,0 +1,14 @@
+app = "pronatec-empreender-scan"
+primary_region = "gru"
+kill_signal = "SIGTERM"
+kill_timeout = 150
+[build]
+  dockerfile = "Dockerfile"
+[[mounts]]
+  source = "clamav_signatures"
+  destination = "/var/lib/clamav"
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "2gb"
+# Intentionally no public listener, public IP allocation or HTTP service.

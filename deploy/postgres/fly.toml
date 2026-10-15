@@ -1,0 +1,18 @@
+app = "pronatec-empreender-db"
+primary_region = "gru"
+kill_signal = "SIGINT"
+kill_timeout = 120
+[build]
+  dockerfile = "Dockerfile"
+[env]
+  POSTGRES_DB = "pronatec"
+  POSTGRES_USER = "postgres"
+  POSTGRES_INITDB_ARGS = "--auth-host=scram-sha-256 --auth-local=trust"
+[[mounts]]
+  source = "pronatec_db"
+  destination = "/data"
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "1gb"
+# No public services or IPs. PostgreSQL is reached only over Fly's private network.
