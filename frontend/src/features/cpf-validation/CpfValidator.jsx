@@ -1,21 +1,18 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Loader2, Search } from 'lucide-react';
 
 import './CpfValidator.css';
 
-import { APPS_SCRIPT_URL, RECAPTCHA_SITE_KEY } from '../../config/env';
-import { postToAppsScript } from '../../services/appsScriptClient';
+import { Turnstile } from '../../components/intake/Turnstile';
+import { api } from '../../services/intakeClient';
 import { formatCpf, onlyDigits } from '../../utils/cpf';
-import { getErrorMessage } from '../../utils/errorMessages';
 
-import { CaptchaBox } from './components/CaptchaBox';
 import { CpfResult } from './components/CpfResult';
 
 export function CpfValidator() {
   const [cpf, setCpf] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
-  const [captchaReady, setCaptchaReady] = useState(false);
-  const [captchaResetKey, setCaptchaResetKey] = useState(0);
+  const [captchaRevision, setCaptchaRevision] = useState(0);
   const [status, setStatus] = useState('idle');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
@@ -26,10 +23,7 @@ export function CpfValidator() {
   function resetResult() {
     setResult(null);
     setError('');
-
-    if (status !== 'loading') {
-      setStatus('idle');
-    }
+    if (status !== 'loading') setStatus('idle');
   }
 
   function handleCpfChange(event) {
@@ -37,54 +31,27 @@ export function CpfValidator() {
     resetResult();
   }
 
-  const handleCaptchaError = useCallback((code) => {
-    setError(getErrorMessage(code));
-    setStatus('error');
-  }, []);
-
-  const handleCaptchaReady = useCallback(() => {
-    setCaptchaReady(true);
-  }, []);
-
   async function handleSubmit(event) {
     event.preventDefault();
-
-    if (!APPS_SCRIPT_URL || !RECAPTCHA_SITE_KEY) {
-      setError(getErrorMessage('configuration_error'));
-      setStatus('error');
-      return;
-    }
-
-    if (digits.length !== 11 || !captchaToken) {
-      setError(getErrorMessage('invalid_request'));
-      setStatus('error');
-      return;
-    }
+    if (!canSubmit) return;
 
     setStatus('loading');
     setError('');
     setResult(null);
 
     try {
-      const payload = await postToAppsScript({
-        action: 'validateCpf',
-        cpf: digits,
-        captchaToken,
+      const payload = await api('/legacy/cpf', {
+        method: 'POST',
+        body: { cpf: digits, captchaToken },
       });
-
-      if (!payload.ok) {
-        setError(getErrorMessage(payload.error));
-        setStatus('error');
-        return;
-      }
-
       setResult(payload);
       setStatus(payload.found ? 'found' : 'notFound');
     } catch (requestError) {
-      setError(getErrorMessage(requestError?.message || 'server_error'));
+      setError(requestError.message);
       setStatus('error');
     } finally {
-      setCaptchaResetKey((current) => current + 1);
+      setCaptchaToken('');
+      setCaptchaRevision((current) => current + 1);
     }
   }
 
@@ -117,15 +84,7 @@ export function CpfValidator() {
 
         <p id="cpf-help">Digite os 11 números do CPF. A pontuação é aplicada automaticamente.</p>
 
-        <CaptchaBox
-          siteKey={RECAPTCHA_SITE_KEY}
-          resetKey={captchaResetKey}
-          onTokenChange={setCaptchaToken}
-          onReady={handleCaptchaReady}
-          onError={handleCaptchaError}
-        />
-
-        {!captchaReady && RECAPTCHA_SITE_KEY ? <p className="muted">Carregando verificação...</p> : null}
+        <Turnstile revision={captchaRevision} onToken={setCaptchaToken} />
       </form>
 
       <CpfResult status={status} result={result} error={error} />

@@ -32,7 +32,10 @@ export function HomePage({ onNavigate }) {
       <section className="home-hero panel">
         <div className="home-hero-copy">
           <span className="section-kicker">Pronatec Empreender 2025</span>
-          <h2>Qualificação profissional para economia digital, inovação tecnológica e empreendedorismo.</h2>
+          <h2>
+            Qualificação profissional para economia digital, inovação tecnológica e
+            empreendedorismo.
+          </h2>
           <p>
             O Pronatec Empreender é um projeto de apoio técnico e pedagógico aos cursos do Pronatec,
             com foco em gestão pedagógica moderna, empregabilidade, permanência dos estudantes e
@@ -40,17 +43,37 @@ export function HomePage({ onNavigate }) {
           </p>
 
           <div className="home-actions">
+            <button type="button" onClick={() => onNavigate('reports')}>
+              <BookOpen size={18} aria-hidden="true" />
+              Relatório da Turma
+            </button>
+            <button
+              className="secondary-action"
+              type="button"
+              onClick={() => onNavigate('participants')}
+            >
+              <Users size={18} aria-hidden="true" />
+              Cadastro de Participantes
+            </button>
             <button type="button" onClick={() => onNavigate('validate')}>
               <Search size={18} aria-hidden="true" />
               Consulta de interessados
             </button>
 
-            <button className="secondary-action" type="button" onClick={() => onNavigate('dashboard')}>
+            <button
+              className="secondary-action"
+              type="button"
+              onClick={() => onNavigate('dashboard')}
+            >
               <LayoutDashboard size={18} aria-hidden="true" />
               Acessar Mapeamento de Alunos
             </button>
 
-            <button className="secondary-action" type="button" onClick={() => onNavigate('secondaryDashboard')}>
+            <button
+              className="secondary-action"
+              type="button"
+              onClick={() => onNavigate('secondaryDashboard')}
+            >
               <Building2 size={18} aria-hidden="true" />
               Coordenação
             </button>
@@ -179,8 +202,8 @@ export function HomePage({ onNavigate }) {
           <h2>Indicadores para tomada de decisão</h2>
           <p>
             Além da consulta pública de interessados, o portal reúne dashboards administrativos para
-            acompanhamento das inscrições, distribuição territorial, perfil dos participantes e dados
-            agregados das instituições ofertantes.
+            acompanhamento das inscrições, distribuição territorial, perfil dos participantes e
+            dados agregados das instituições ofertantes.
           </p>
         </div>
 
@@ -190,7 +213,11 @@ export function HomePage({ onNavigate }) {
             <ArrowRight size={17} aria-hidden="true" />
           </button>
 
-          <button className="secondary-action" type="button" onClick={() => onNavigate('secondaryDashboard')}>
+          <button
+            className="secondary-action"
+            type="button"
+            onClick={() => onNavigate('secondaryDashboard')}
+          >
             Dashboard Coordenação
             <ArrowRight size={17} aria-hidden="true" />
           </button>

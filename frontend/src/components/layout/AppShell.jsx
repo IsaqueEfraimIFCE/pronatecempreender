@@ -7,12 +7,23 @@ import './AppShell.css';
 
 const NAV_ITEMS = [
   { view: 'home', path: '/', label: 'Início', icon: Home },
+  { view: 'reports', path: '/relatorios', label: 'Relatório da Turma', icon: Database },
+  {
+    view: 'participants',
+    path: '/participantes',
+    label: 'Cadastro de Participantes',
+    icon: ShieldCheck,
+  },
+  { view: 'admin', path: '/administracao', label: 'Administração', icon: ShieldCheck },
   { view: 'validate', path: '/consulta', label: 'Consulta de Interessados', icon: Search },
   { view: 'dashboard', path: '/setec', label: 'SETEC', icon: LayoutDashboard },
   { view: 'secondaryDashboard', path: '/coordenacao', label: 'Coordenação', icon: Database },
 ];
 
 function getActiveView(pathname) {
+  if (pathname.startsWith('/relatorios')) return 'reports';
+  if (pathname.startsWith('/participantes')) return 'participants';
+  if (pathname.startsWith('/administracao')) return 'admin';
   if (pathname.startsWith('/consulta')) return 'validate';
   if (pathname.startsWith('/setec')) return 'dashboard';
   if (pathname.startsWith('/coordenacao')) return 'secondaryDashboard';

@@ -1,7 +1,7 @@
 import { BarChart3, Database, Gauge, MapPin, Users } from 'lucide-react';
 
 import { GenericChartPanel } from '../../components/charts/GenericChartPanel/GenericChartPanel';
-import { ScheduleColumnPanel } from '../../components/charts/ScheduleColumnPanel/ScheduleColumnPanel';
+import { OfferCalendar } from '../../components/charts/OfferCalendar/OfferCalendar';
 import { StatePanel } from '../../components/feedback/StatePanel';
 import { MetricCard } from '../../components/ui/MetricCard';
 import { CHART_HELP } from '../../data/chartHelp';
@@ -40,7 +40,7 @@ const normalizedOtherCharts = otherCharts.map((chart) => ({
 
       {scheduleChart ? (
         <section className="dashboard-feature-grid">
-          <ScheduleColumnPanel
+          <OfferCalendar
             title={'Início das ofertas por campi'}
             icon={BarChart3}
             items={scheduleChart.items || []}

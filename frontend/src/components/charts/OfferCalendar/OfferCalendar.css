@@ -1,0 +1,164 @@
+.offer-calendar {
+  display: grid;
+  gap: 16px;
+}
+
+.offer-calendar-total {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.offer-calendar-year h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.offer-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.offer-calendar-cell {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  padding: 10px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--if-green) calc(var(--intensity, 0) * 55%), var(--panel));
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out);
+}
+
+.offer-calendar-cell:hover:not(:disabled),
+.offer-calendar-cell:focus-visible {
+  border-color: var(--if-green-strong);
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.offer-calendar-cell.active {
+  border-color: var(--if-green-dark);
+  box-shadow: inset 0 0 0 2px var(--if-green-dark);
+}
+
+.offer-calendar-cell.is-empty {
+  background: var(--surface-2);
+  color: var(--muted-soft);
+  cursor: default;
+}
+
+.offer-calendar-month {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.offer-calendar-cell strong {
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.offer-calendar-cell small {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.offer-calendar-undated {
+  justify-self: start;
+  display: inline-flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 8px 14px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.offer-calendar-undated.active {
+  border-style: solid;
+  border-color: var(--if-green-dark);
+}
+
+.offer-calendar-details {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.offer-calendar-details-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 10px;
+}
+
+.offer-calendar-details-head strong {
+  text-transform: capitalize;
+}
+
+.offer-calendar-details-head span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.offer-calendar-groups {
+  display: grid;
+  gap: 12px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.offer-calendar-group h4 {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.offer-calendar-group h4 span {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.offer-calendar-group ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.offer-calendar-group li {
+  display: grid;
+  gap: 1px;
+  padding: 8px 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-xs);
+  background: var(--panel);
+}
+
+.offer-calendar-group li span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .offer-calendar-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

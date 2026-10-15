@@ -14,7 +14,7 @@ export function CpfResult({ status, result, error }) {
         tone="neutral"
         icon={Loader2}
         title="Consultando"
-        text="Estamos verificando a planilha de respostas."
+        text="Estamos verificando a base de respostas."
         spinning
       />
     );

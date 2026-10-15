@@ -22,7 +22,7 @@ export function SecondaryDashboardSetup() {
         <div>
           <ShieldCheck size={20} aria-hidden="true" />
           <strong>Acesso</strong>
-          <span>Consulta administrativa protegida por chave</span>
+          <span>Consulta protegida por código de acesso</span>
         </div>
 
         <div>
