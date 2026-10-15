@@ -1,0 +1,24 @@
+{
+  "name": "pronatec-portal",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
+  "scripts": {
+    "build": "npm run build --workspace frontend",
+    "start": "npm run start --workspace backend",
+    "worker": "npm run worker --workspace backend",
+    "migrate": "npm run migrate --workspace backend",
+    "test": "node --test shared/test/*.test.js backend/test/*.test.js",
+    "test:integration": "node --test backend/test/integration/*.test.js"
+  }
+}

@@ -2,39 +2,46 @@
 # STAGE 1 - BUILD DO FRONTEND
 # ============================================================
 
-FROM node:22-alpine AS build
+FROM node:22-bookworm-slim AS build
 
-WORKDIR /app/frontend
+WORKDIR /app
 
-COPY frontend/package*.json ./
+COPY package.json package-lock.json ./
+COPY frontend/package.json frontend/package.json
+COPY backend/package.json backend/package.json
+COPY shared/package.json shared/package.json
 
 RUN npm ci
 
-COPY frontend/ ./
+COPY frontend/ frontend/
+COPY shared/ shared/
+COPY backend/ backend/
 
-ARG VITE_RECAPTCHA_SITE_KEY
-ARG VITE_APPS_SCRIPT_URL
+RUN npm test
+
 ARG VITE_FORM_URL
-ARG VITE_SECONDARY_APPS_SCRIPT_URL
 
-ENV VITE_RECAPTCHA_SITE_KEY=$VITE_RECAPTCHA_SITE_KEY
-ENV VITE_APPS_SCRIPT_URL=$VITE_APPS_SCRIPT_URL
 ENV VITE_FORM_URL=$VITE_FORM_URL
-ENV VITE_SECONDARY_APPS_SCRIPT_URL=$VITE_SECONDARY_APPS_SCRIPT_URL
 
-RUN npm run build
+RUN npm run build && npm prune --omit=dev
 
 
 # ============================================================
 # STAGE 2 - SERVIDOR DE PRODUÇÃO
 # ============================================================
 
-FROM nginx:1.27-alpine AS production
+FROM node:22-bookworm-slim AS production
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+ENV NODE_ENV=production PORT=8080
+WORKDIR /app
+COPY --from=build --chown=node:node /app/node_modules node_modules
+COPY --from=build --chown=node:node /app/frontend/dist frontend/dist
+COPY --chown=node:node package.json ./
+COPY --chown=node:node backend backend
+COPY --chown=node:node shared shared
 
-COPY --from=build /app/frontend/dist /usr/share/nginx/html/empreender
+USER node
 
-EXPOSE 80
+EXPOSE 8080
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node", "backend/src/server.js"]
